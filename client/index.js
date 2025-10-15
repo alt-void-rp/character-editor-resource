@@ -1,52 +1,46 @@
 import * as alt from 'alt-client';
 import { registerServerEvents, registerWebViewEvents } from './events/index.js';
-import { 
-    InitCamera, 
-    DestroyCamera, 
-} from './camera/index.js';
-import * as appearance from './handlers/appearance.js';
+import { InitCamera, DestroyCamera } from './camera/index.js';
+import { spawnPreviewPed, destroyPreviewPed } from './handlers/preview.js';
 
-function editor(webview) {
-    
-    registerServerEvents();
-    registerWebViewEvents(webview);
+const webview = new alt.WebView('http://resource/client/ui/editor.html', true);
 
-    const InitEditor = () => {
-        appearance.ensureFreemodeModel();
+if (webview) {
+    webview.focus();
+    alt.showCursor(true);
+    alt.toggleGameControls(false);
+}
 
-        // Камера
-        InitCamera();
-        if (webview) {
-            webview.focus();          
-            alt.showCursor(true);      
-            alt.toggleGameControls(false); 
-        }
-        alt.log('📝 Editor initialized');
+registerWebViewEvents(webview);
+registerServerEvents();
 
-        // Горячие клавиши
-        alt.on('keydown', (key) => {
-            if (key === alt.KeyCode.J) setCameraPreset('full-body');
-            if (key === alt.KeyCode.K) setCameraPreset('face');
-            if (key === alt.KeyCode.L) setCameraPreset('side');
+export const Editor = (() => {
+    const InitEditor = async () => {
+        await spawnPreviewPed();
+        await InitCamera();
+
+        alt.on('keydown', async (key) => {
+            if (key === alt.KeyCode.J) await setCameraPreset('full-body');
+            if (key === alt.KeyCode.K) await setCameraPreset('face');
+            if (key === alt.KeyCode.L) await setCameraPreset('side');
         });
 
+        alt.log('📝 Character Editor initialized');
     };
 
     const DestroyEditor = () => {
         DestroyCamera();
+        destroyPreviewPed();
+
         if (webview) {
             webview.unfocus();
-            webview.showCursor(false);
+            alt.showCursor(false);
         }
-        alt.log('📝 Editor destroyed');
+
+        alt.log('🧹 Character Editor destroyed');
     };
 
     return { InitEditor, DestroyEditor };
-}
+})();
 
-// --- WebView ---
-const webview = new alt.WebView('http://resource/client/ui/editor.html', true);
-export const Editor = editor(webview);
-
-// --- Автозапуск ---
 alt.log('✅ Resource [character-editor] client started');

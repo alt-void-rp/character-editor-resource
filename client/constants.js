@@ -14,5 +14,3 @@ export const CLIENT_EVENTS = {
     CHARACTER_FOCUS_LIMB: 'character-editor:focusLimb',
     CHARACTER_SET_CAMERA_PRESET: 'character-editor:setPreset',
 };
-
-

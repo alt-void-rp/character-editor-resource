@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Character Editor</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; background-color: #1a1a1a00;}
+        .panel { position: absolute; top: 10px; left: 10px; width: 300px; background: #222; padding: 10px; border-radius: 6px; }
+        label { display: block; margin: 5px 0 2px; }
+        input, select { width: 100%; margin-bottom: 10px; }
+        button { width: 100%; margin-top: 5px; padding: 5px; background: #444; color: #fff; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #666; }
+    </style>
+</head>
+<body>
+
+<div class="panel">
+    <h2>Character Editor</h2>
+
+    <label>Head Blend - Shape First ID</label>
+    <input type="number" id="shapeFirstID" value="0">
+
+    <label>Shape Second ID</label>
+    <input type="number" id="shapeSecondID" value="0">
+
+    <label>Shape Third ID</label>
+    <input type="number" id="shapeThirdID" value="0">
+
+    <label>Skin First ID</label>
+    <input type="number" id="skinFirstID" value="0">
+
+    <label>Skin Second ID</label>
+    <input type="number" id="skinSecondID" value="0">
+
+    <label>Skin Third ID</label>
+    <input type="number" id="skinThirdID" value="0">
+
+    <label>Shape Mix (0-1)</label>
+    <input type="number" step="0.01" id="shapeMix" value="0.5">
+
+    <label>Skin Mix (0-1)</label>
+    <input type="number" step="0.01" id="skinMix" value="0.5">
+
+    <label>Third Mix (0-1)</label>
+    <input type="number" step="0.01" id="thirdMix" value="0.0">
+
+    <label>Is Parent</label>
+    <select id="isParent">
+        <option value="false">False</option>
+        <option value="true">True</option>
+    </select>
+
+    <button id="applyHeadBlend">Apply Head Blend</button>
+    <hr>
+
+    <label>Eye Color (1-31)</label>
+    <input type="number" id="eyeColor" value="1">
+    <button id="applyEyeColor">Apply Eye Color</button>
+    <hr>
+
+    <label>Hair Color</label>
+    <input type="number" id="hairColor" value="0">
+
+    <label>Highlight Color</label>
+    <input type="number" id="hairHighlight" value="0">
+    <button id="applyHair">Apply Hair</button>
+
+    <hr>
+    <label>Focus Limb (x,y,z)</label>
+    <input type="text" id="limbPos" placeholder="x,y,z">
+    <button id="focusLimb">Focus Limb</button>
+
+    <hr>
+    <button id="presetFull">Full Body</button>
+    <button id="presetFace">Face</button>
+    <button id="presetSide">Side</button>
+</div>
+
+<script>
+    // Используем alt.emit для вызова событий на клиенте
+    const CLIENT_EVENTS = {
+        CHARACTER_SET_HEAD_BLEND: 'character:setHeadBlend',
+        CHARACTER_SET_EYE_COLOR: 'character:setEyeColor',
+        CHARACTER_SET_HAIR: 'character:setHair',
+        CHARACTER_FOCUS_LIMB: 'character-editor:focusLimb',
+        CHARACTER_SET_CAMERA_PRESET: 'character-editor:setPreset'
+    };
+
+    const getHeadBlendData = () => ({
+        shapeFirstID: parseInt(document.getElementById('shapeFirstID').value),
+        shapeSecondID: parseInt(document.getElementById('shapeSecondID').value),
+        shapeThirdID: parseInt(document.getElementById('shapeThirdID').value),
+        skinFirstID: parseInt(document.getElementById('skinFirstID').value),
+        skinSecondID: parseInt(document.getElementById('skinSecondID').value),
+        skinThirdID: parseInt(document.getElementById('skinThirdID').value),
+        shapeMix: parseFloat(document.getElementById('shapeMix').value),
+        skinMix: parseFloat(document.getElementById('skinMix').value),
+        thirdMix: parseFloat(document.getElementById('thirdMix').value),
+        isParent: document.getElementById('isParent').value === 'true'
+    });
+
+    document.getElementById('applyHeadBlend').onclick = () => {
+        const data = getHeadBlendData();
+        alt.emit(CLIENT_EVENTS.CHARACTER_SET_HEAD_BLEND, data);
+    };
+
+    document.getElementById('applyEyeColor').onclick = () => {
+        const index = parseInt(document.getElementById('eyeColor').value);
+        alt.emit(CLIENT_EVENTS.CHARACTER_SET_EYE_COLOR, index);
+    };
+
+    document.getElementById('applyHair').onclick = () => {
+        const data = {
+            colorID: parseInt(document.getElementById('hairColor').value),
+            highlightColorID: parseInt(document.getElementById('hairHighlight').value)
+        };
+        alt.emit(CLIENT_EVENTS.CHARACTER_SET_HAIR, data);
+    };
+
+    document.getElementById('focusLimb').onclick = () => {
+        const posText = document.getElementById('limbPos').value;
+        const [x, y, z] = posText.split(',').map(Number);
+        alt.emit(CLIENT_EVENTS.CHARACTER_FOCUS_LIMB, { x, y, z });
+    };
+
+    document.getElementById('presetFull').onclick = () => alt.emit(CLIENT_EVENTS.CHARACTER_SET_CAMERA_PRESET, 'full-body');
+    document.getElementById('presetFace').onclick = () => alt.emit(CLIENT_EVENTS.CHARACTER_SET_CAMERA_PRESET, 'face');
+    document.getElementById('presetSide').onclick = () => alt.emit(CLIENT_EVENTS.CHARACTER_SET_CAMERA_PRESET, 'side');
+</script>
+</body>
+</html>

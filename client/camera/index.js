@@ -1,6 +1,6 @@
 import * as alt from 'alt-client';
 import * as native from 'natives';
-import { getPreviewPed } from '../handlers/preview.js';
+import { getPreviewPed } from '../editor/preview.js';
 
 let camera = null;
 let currentPreset = 'full-body';
@@ -24,7 +24,7 @@ async function waitForPed(timeout = 5000) {
 
 // --- Инициализация камеры редактора ---
 export async function InitCamera() {
-    const ped = await waitForPed();
+    const ped = await waitForPed() || alt.Player.local;
     if (!ped) return;
 
     alt.toggleGameControls(false);

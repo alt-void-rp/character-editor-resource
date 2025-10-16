@@ -1,3 +1,5 @@
+import * as SHARED_VARIABLES from 'alt:backend-controls'
+
 export const EVENTS = {
     SERVER: {
         CHARACTER_UPDATE: 'server:characterUpdate',
@@ -13,4 +15,7 @@ export const CLIENT_EVENTS = {
     CHARACTER_ADD_TATTOO: 'character:addTattoo',
     CHARACTER_FOCUS_LIMB: 'character-editor:focusLimb',
     CHARACTER_SET_CAMERA_PRESET: 'character-editor:setPreset',
+    CHARACTER_SET_MODEL: 'character-editor:setModel',
 };
+
+export const FRONTEND_URL = `${SHARED_VARIABLES.FRONTEND_URL}`;

@@ -3,36 +3,44 @@ import * as native from 'natives';
 
 let previewPed = null;
 
-/**
- * Загружает модель по имени с безопасной проверкой
- */
-export async function loadModel(modelName) {
-    const hash = native.getHashKey(modelName); // ✅ правильный метод
+// Хэши freemode моделей
+const MODEL_HASHES = {
+    mp_m_freemode_01: 1885233650,
+    mp_f_freemode_01: 2627665880,
+};
 
-    if (!native.isModelInCdimage(hash) || !native.isModelValid(hash)) {
-        alt.logError(`❌ Модель ${modelName} (${hash}) не существует или недоступна`);
+// Загружаем модель
+async function loadModel(modelName) {
+    const hash = MODEL_HASHES[modelName];
+    if (!hash) {
+        alt.logError(`❌ Неизвестная модель: ${modelName}`);
         return null;
     }
 
     native.requestModel(hash);
-
     let attempts = 0;
     while (!native.hasModelLoaded(hash)) {
-        await new Promise(res => alt.setTimeout(res, 50));
+        await alt.Utils.wait(50);
         attempts++;
         if (attempts > 100) {
-            alt.logError(`⏱ Не удалось загрузить модель ${modelName} (${hash})`);
+            alt.logError(`❌ Модель ${modelName} не загрузилась`);
             return null;
         }
     }
-
-    alt.log(`✅ Модель ${modelName} загружена`);
     return hash;
 }
 
-/**
- * Создаёт previewPed для предпросмотра персонажа
- */
+// Сбрасываем всё кроме штанов
+function clearClothesExceptPants(ped) {
+    if (!ped || !native.doesEntityExist(ped)) return;
+
+    for (let slot = 0; slot <= 11; slot++) {
+        if (slot === 2) continue; // оставляем штаны
+        native.setPedComponentVariation(ped, slot, 0, 0, 0);
+    }
+}
+
+// Создаём PreviewPed
 export async function spawnPreviewPed(modelName) {
     const player = alt.Player.local;
     if (!player?.valid || !player.scriptID) {
@@ -40,14 +48,10 @@ export async function spawnPreviewPed(modelName) {
         return null;
     }
 
-    // Предзагрузка freemode моделей (важно!)
-    await loadModel('mp_m_freemode_01');
-    await loadModel('mp_f_freemode_01');
-
     const modelHash = await loadModel(modelName);
     if (!modelHash) return null;
 
-    // Удаляем предыдущего педа
+    // Удаляем старого педа
     if (previewPed && native.doesEntityExist(previewPed)) {
         native.deletePed(previewPed);
         previewPed = null;
@@ -57,41 +61,34 @@ export async function spawnPreviewPed(modelName) {
     native.setEntityVisible(player.scriptID, false, false);
 
     const pos = player.pos;
-    previewPed = native.createPed(2, modelHash, pos.x, pos.y, pos.z, 180.0, false, true);
+    previewPed = native.createPed(2, modelHash, pos.x, pos.y, pos.z -1, 180.0, false, true);
 
     if (!native.doesEntityExist(previewPed)) {
         alt.logError(`❌ PreviewPed не появился (${modelName})`);
         return null;
     }
 
-    //native.setPedDefaultComponentVariation(previewPed); // можно вызвать до или после очистки, но лучше после
+    native.setPedDefaultComponentVariation(previewPed);
+    clearClothesExceptPants(previewPed);
     native.setEntityInvincible(previewPed, true);
     native.freezeEntityPosition(previewPed, true);
     native.taskStandStill(previewPed, -1);
 
     native.setModelAsNoLongerNeeded(modelHash);
 
-    alt.log(`✅ PreviewPed успешно создан (${modelName}) с одними штанами`);
+    alt.log(`✅ PreviewPed успешно создан (${modelName})`);
+    return previewPed;
 }
 
-/**
- * Возвращает текущего previewPed
- */
 export function getPreviewPed() {
     return previewPed;
 }
 
-/**
- * Удаляет previewPed и возвращает видимость игрока
- */
 export function destroyPreviewPed() {
     const player = alt.Player.local;
-
     if (previewPed && native.doesEntityExist(previewPed)) {
         native.deletePed(previewPed);
         previewPed = null;
-        alt.log('🗑️ PreviewPed удалён');
     }
-
     native.setEntityVisible(player.scriptID, true, false);
 }

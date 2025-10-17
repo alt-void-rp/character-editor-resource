@@ -29,6 +29,8 @@ export const Editor = (() => {
         alt.toggleGameControls(true);
     };
 
+    InitEditor();
+
     return { InitEditor, CloseEditor };
 })();
 

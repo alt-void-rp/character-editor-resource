@@ -17,6 +17,7 @@ export const CLIENT_EVENTS = {
     CHARACTER_FOCUS_LIMB: 'character-editor:focusLimb',
     CHARACTER_SET_CAMERA_PRESET: 'character-editor:setPreset',
     CHARACTER_SET_MODEL: 'character-editor:setModel',
+    CHARACTER_CAMERA_POSE: 'character-editor:setPoseCamera'
 };
 
 export const FRONTEND_URL = `${SHARED_VARIABLES.FRONTEND_URL}`;

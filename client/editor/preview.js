@@ -61,7 +61,7 @@ export async function spawnPreviewPed(modelName) {
     native.setEntityVisible(player.scriptID, false, false);
 
     const pos = player.pos;
-    previewPed = native.createPed(2, modelHash, pos.x, pos.y, pos.z -1, 180.0, false, true);
+    previewPed = native.createPed(2, modelHash, pos.x, pos.y - 6, pos.z -1, 180.0, false, true);
 
     if (!native.doesEntityExist(previewPed)) {
         alt.logError(`❌ PreviewPed не появился (${modelName})`);

@@ -24,7 +24,7 @@ async function waitForPed(timeout = 5000) {
 
 // --- Инициализация камеры редактора ---
 export async function InitCamera() {
-    const ped = await waitForPed() || alt.Player.local;
+    const ped = await waitForPed();
     if (!ped) return;
 
     alt.toggleGameControls(false);

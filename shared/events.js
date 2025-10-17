@@ -3,6 +3,7 @@ import * as SHARED_VARIABLES from 'alt:backend-controls'
 export const EVENTS = {
     SERVER: {
         CHARACTER_UPDATE: 'server:characterUpdate',
+        CHARACTER_SET_MODEL: 'server:setModel',
     },
 };
 

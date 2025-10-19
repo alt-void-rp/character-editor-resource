@@ -1,46 +1,21 @@
 import * as native from 'natives';
 import * as alt from 'alt-client';
-import { getPreviewPed } from './preview.js';
 
-function ped() {
-    const player = alt.Player.local;
-    if (!player || !player.scriptID) return null;
-    return getPreviewPed() || player.scriptID;
-}
-
-export function setHeadBlend(data) {
+/**
+ * Установить родителей и смешивание лица
+ */
+export async function setPedParents(ped, dad, mom, shapeMix, skinMix) {
     native.setPedHeadBlendData(
-        ped(),
-        data.shapeFirstID,
-        data.shapeSecondID,
-        data.shapeThirdID,
-        data.skinFirstID,
-        data.skinSecondID,
-        data.skinThirdID,
-        data.shapeMix,
-        data.skinMix,
-        data.thirdMix,
-        data.isParent
+        ped,
+        dad,        // shapeFirst (отец)
+        mom,        // shapeSecond (мать)
+        0,          // третья форма (можно 0)
+        dad,        // skinFirst
+        mom,        // skinSecond
+        0,          // skinThird
+        shapeMix,   // смешивание формы
+        skinMix,    // смешивание кожи
+        0,          // третье смешивание
+        false       // isParent?
     );
-}
-
-export function setMicroMorph(data) {
-    native.setPedMicroMorph(ped(), data.index, data.scale);
-}
-
-export function setHeadOverlay(data) {
-    native.setPedHeadOverlay(ped(), data.overlayID, data.index, data.opacity);
-    native.setPedHeadOverlayTint(ped(), data.overlayID, data.colorType, data.colorID, data.secondColorID);
-}
-
-export function setEyeColor(index) {
-    native.setHeadBlendEyeColor(ped(), index);
-}
-
-export function setHair(data) {
-    native.setPedHairTint(ped(), data.colorID, data.highlightColorID);
-}
-
-export function addTattoo(hash) {
-    native.addPedDecorationFromHashes(ped(), hash.collection, hash.overlay);
 }

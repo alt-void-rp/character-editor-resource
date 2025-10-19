@@ -1,6 +1,6 @@
 import * as alt from 'alt-client';
 import { EVENTS, CLIENT_EVENTS } from '../../shared/events.js';
-import { setModel } from '../handlers/index.js'
+import { setModel, setParents } from '../handlers/index.js'
 import { setCameraPreset } from '../camera/index.js';
 
 
@@ -22,6 +22,17 @@ export function registerWebViewEvents(webview) {
         const preset = JSON.parse(data).gender;
         await setCameraPreset(preset);
     });
+
+    webview.on(CLIENT_EVENTS.CHARACTER_SET_PARENTS, async (data) => {
+        const d = JSON.parse(data);
+        setParents(d);
+    });
+
+
+    
+
+
+    
 
     alt.log('🌐 WebView events registered');
 }

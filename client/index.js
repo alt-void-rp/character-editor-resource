@@ -10,18 +10,18 @@ let webview = null;
 export const Editor = (() => {
 
     const InitEditor = async () => {
+        await alt.Utils.wait(2000);
         if (!webview) {
             webview = new alt.WebView(`${FRONTEND_URL}/character/editor`, false);
             registerWebViewEvents(webview);
             registerServerEvents();
         }
         native.displayRadar(false);
-        
 
         const ped = await spawnPreviewPed('mp_m_freemode_01');
         await InitCamera(ped);
 
-        await alt.Utils.wait(2000);
+        
         webview.focus();
         webview.isVisible = true; 
         alt.showCursor(true);
